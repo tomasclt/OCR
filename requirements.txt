@@ -2,5 +2,6 @@ streamlit
 streamlit-webrtc
 numpy
 opencv-python-headless
-pytesseract==0.3.8
+tesseract-ocr
+tesseract-ocr-spa
 Pillow
