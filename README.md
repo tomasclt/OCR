@@ -1,1 +1,1 @@
-# st_helloword
+# Reconocimiento Óptico de Caracteres
