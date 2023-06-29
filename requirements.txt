@@ -2,5 +2,5 @@ streamlit
 streamlit-webrtc
 numpy
 opencv-python-headless
-pytesseract
+pytesseract==0.3.8
 Pillow
