@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 import numpy as np
 import pytesseract
+from PIL import Image
 
 img_file_buffer = st.camera_input("Take a picture")
 
