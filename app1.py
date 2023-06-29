@@ -14,11 +14,9 @@ if img_file_buffer is not None:
     bytes_data = img_file_buffer.getvalue()
     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 
-   filtro = st.radio(
-    "Aplicar Filtro",
-    ('Con Filtro', 'Sin Filtro'))
+   filtro = st.radio("Aplicar Filtro",('Con Filtro', 'Sin Filtro'))
 
-    if filtro == Con Filtro':
+    if filtro == 'Con Filtro':
        cv2_img=cv2.bitwise_not(cv2_img)
     else:
        cv2_img= cv2_img
