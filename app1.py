@@ -11,9 +11,11 @@ if img_file_buffer is not None:
 
     # Check the type of cv2_img:
     # Should output: <class 'numpy.ndarray'>
-    st.write(type(cv2_img))
+    #st.write(type(cv2_img))
 
     # Check the shape of cv2_img:
     # Should output shape: (height, width, channels)
-    st.write(cv2_img.shape)
+    #st.write(cv2_img.shape)
 
+    img_rgb = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
+    print(pytesseract.image_to_string(img_rgb))
