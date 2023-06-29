@@ -11,6 +11,10 @@ if img_file_buffer is not None:
     bytes_data = img_file_buffer.getvalue()
     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 
+    pil_image = Image.open(bytes_data)
+    text = pytesseract.image_to_string(pil_image)
+    st.write(text)
+
     # Check the type of cv2_img:
     # Should output: <class 'numpy.ndarray'>
     #st.write(type(cv2_img))
