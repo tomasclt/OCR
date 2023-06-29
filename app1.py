@@ -22,7 +22,7 @@ if img_file_buffer is not None:
     #img_rgb = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)
     #st.write(pytesseract.image_to_string(img_rgb))
 
-    img_rgb = Image.frombytes('RGB', img_cv.shape[:2], img_cv, 'raw', 'BGR', 0, 0)
+    img_rgb = Image.frombytes('RGB', cv2_img.shape[:2], cv2_img, 'raw', 'BGR', 0, 0)
     text_in=pytesseract.image_to_string(img_rgb)
     st.write(text_in)
 
