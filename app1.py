@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import streamlit as st
 import cv2
 import numpy as np
@@ -11,49 +12,128 @@ from io import BytesIO
 st.set_page_config(page_title="OCR Cam", page_icon="🔎", layout="centered")
 
 # -----------------------------------------------------------------------------
-# Estilos (solo estética)
+# Estilos (Dark theme alto contraste, SOLO estética)
 # -----------------------------------------------------------------------------
 st.markdown("""
 <style>
-/* Tipografía y container */
-html, body, [class*="css"]  {
-  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji';
+:root{
+  --radius: 16px;
+  /* Paleta con contraste real */
+  --bgA: #0b1120;        /* fondo base */
+  --bgB: #0f172a;        /* fondo gradiente */
+  --panel: #111827;      /* panel sólido */
+  --panel-border: #1f2937;
+  --text: #f8fafc;       /* texto principal */
+  --muted: #cbd5e1;      /* texto secundario */
+  --input: #0f172a;      /* fondo inputs */
+  --input-border: #334155;
+  --focus: #22d3ee;      /* foco visible */
+  --primaryA: #2563eb;   /* azul 600 */
+  --primaryB: #1d4ed8;   /* azul 700 */
 }
-main .block-container {padding-top: 2rem; padding-bottom: 3rem; max-width: 900px;}
 
-/* Tarjetas */
+/* Fondo oscuro del contenedor raíz */
+[data-testid="stAppViewContainer"]{
+  background: linear-gradient(180deg, var(--bgA) 0%, var(--bgB) 100%) !important;
+  color: var(--text) !important;
+}
+html, body{
+  color: var(--text) !important;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+main .block-container{padding-top: 2rem; padding-bottom: 3rem; max-width: 900px;}
+
+/* Tarjetas (manteniendo tu clase .card) */
 .card {
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
   border-radius: 18px;
   padding: 18px 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45);
 }
+
+/* Encabezado + badge */
 .header { display:flex; align-items:center; gap:.6rem; margin-bottom:.5rem; }
 .badge {
   font-size: .75rem; padding: .25rem .55rem; border-radius: 999px;
-  background: #EEF2FF; color:#3730A3; border: 1px solid #E0E7FF; font-weight: 600;
+  background: linear-gradient(90deg, var(--primaryA), var(--primaryB));
+  color:#ffffff; border: 0; font-weight: 600;
 }
-h1, h2, h3 { letter-spacing: -0.02em; }
+h1, h2, h3 { letter-spacing: -0.02em; color:#f9fafb !important; }
 footer {visibility: hidden;}
-
-/* Sidebar con gradiente */
-section[data-testid="stSidebar"] > div:first-child {
-  background: linear-gradient(180deg, #0EA5E9 0%, #6366F1 100%);
+/* Asegurar color de textos y labels en todo el main */
+[data-testid="stMarkdownContainer"], 
+[data-testid="stMarkdownContainer"] *, 
+label, label *, 
+.stRadio, .stRadio *, 
+.stCheckbox, .stCheckbox * {
+  color: var(--text) !important;
+  opacity: 1 !important;
 }
-section[data-testid="stSidebar"] * { color: #f7faff !important; }
-div[role="radiogroup"] label { color:#0f172a !important; } /* radios dentro del main */
+
+/* Sidebar oscuro consistente */
+section[data-testid="stSidebar"] > div:first-child {
+  background: #0c1324;
+  border-right: 1px solid var(--panel-border);
+}
+section[data-testid="stSidebar"] * { color: var(--text) !important; }
+
+/* Inputs/controles */
+.stTextInput input,
+.stTextArea textarea,
+.stSelectbox div[data-baseweb="select"] > div,
+.stMultiSelect > div > div {
+  background: var(--input) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--text) !important;
+  border-radius: 12px !important;
+}
+.stTextArea textarea::placeholder,
+.stTextInput input::placeholder{ color: #94a3b8 !important; }
+div[role="radiogroup"] label { color: var(--text) !important; }
+input[type="radio"], input[type="checkbox"]{ accent-color: var(--primaryA) !important; }
+
+/* Estados de foco visibles */
+:focus, :focus-visible,
+.stTextInput input:focus,
+.stTextArea textarea:focus,
+.stSelectbox div[data-baseweb="select"] > div:focus{
+  outline: 2px solid var(--focus) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
 
 /* Caja tipo terminal para el texto OCR */
 .codebox {
-  background:#0b1220; color:#e2e8f0; border-radius:14px; padding:14px 16px;
-  border:1px solid rgba(255,255,255,.08);
+  background:#0b1220; color:#e5e7eb; border-radius:14px; padding:14px 16px;
+  border:1px solid #1f2937;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  line-height: 1.5;
-  overflow-x: auto;
-  white-space: pre-wrap;
+  line-height: 1.5; overflow-x: auto; white-space: pre-wrap;
 }
-.small { opacity:.85; font-size:.9rem; }
+
+/* Botones sólidos y legibles (incluye download button) */
+.stButton > button, .stDownloadButton > button{
+  border-radius: 999px;
+  padding: .72rem 1.15rem;
+  border: 1px solid var(--panel-border);
+  background: linear-gradient(90deg, var(--primaryA), var(--primaryB)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 14px 36px rgba(37,99,235,.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.stButton > button:hover, .stDownloadButton > button:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 18px 48px rgba(37,99,235,.45);
+}
+
+/* Imagen */
+div[data-testid="stImage"] img{
+  border-radius: 14px !important;
+  box-shadow: 0 22px 60px rgba(0,0,0,.55);
+}
+
+/* Pequeños */
+.small { opacity:.9; font-size:.9rem; color: var(--muted) !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -141,7 +221,8 @@ else:
                 label="⬇️ Descargar TXT",
                 data=buffer_txt,
                 file_name="resultado_ocr.txt",
-                mime="text/plain"
+                mime="text/plain",
+                use_container_width=True
             )
         else:
             st.info("No se detectó texto. Acerca más la cámara, mejora la luz o prueba con **Con Filtro**.")
@@ -153,7 +234,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 # -----------------------------------------------------------------------------
 st.markdown(
     "<div class='small' style='text-align:center; margin-top:24px;'>"
-    "Hecho con Streamlit + OpenCV + Tesseract • vEstética 💅"
+    "Hecho con Streamlit + OpenCV + Tesseract • Tema oscuro legible ✨"
     "</div>",
     unsafe_allow_html=True
 )
